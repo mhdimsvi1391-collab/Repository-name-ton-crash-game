@@ -13,25 +13,25 @@
 .card{background:linear-gradient(135deg,#172e45,#172039);border:1px solid #2b405c;border-radius:28px;padding:22px;margin-bottom:18px}.muted{color:var(--muted)}.balance-title{font-size:14px;color:var(--muted)}.balance{font-size:32px;font-weight:800;margin:6px 0}.balance span{font-size:17px;color:var(--mint)}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.tab{background:var(--panel);padding:14px 5px;border-radius:17px;text-align:center;font-size:14px;color:#dce5f4}.tab.active{background:#204d51;color:var(--mint)}
 .game{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;height:330px;background-color:#101c30;background-image:linear-gradient(#26374e 1px,transparent 1px),linear-gradient(90deg,#26374e 1px,transparent 1px);background-size:10% 20%;display:flex;align-items:center;justify-content:center;text-align:center;margin:18px 0}.mult{font-size:clamp(50px,12vw,72px);font-weight:850;color:var(--mint);line-height:1}.status{color:var(--muted);margin-top:16px;font-size:18px}.rocket{position:absolute;left:18px;bottom:50px;font-size:36px;transition:transform .1s linear}.floor{position:absolute;bottom:28px;left:4%;right:4%;height:5px;background:var(--mint);border-radius:5px}
-input{width:100%;padding:17px;border-radius:18px;background:#101c30;border:1px solid #344761;color:#fff;font-size:20px;margin:8px 0 14px;outline:none}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:22px;padding:20px 10px;font-size:18px;font-weight:800;background:var(--mint);color:#05251e}.btn.secondary{background:#655a38;color:#fff}.btn:disabled{opacity:.4}.stats{margin-top:20px;background:#101c30;border-radius:24px;padding:20px}.stat{display:flex;justify-content:space-between;padding:8px 0;color:var(--muted)}.stat strong{color:#fff}.note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:16px}
+input{width:100%;padding:17px;border-radius:18px;background:#101c30;border:1px solid #344761;color:#fff;font-size:20px;margin:8px 0 14px;outline:none}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:22px;padding:20px 10px;font-size:18px;font-weight:800;background:var(--mint);color:#05251e}.btn.secondary{background:#655a38;color:#fff}.btn:disabled{opacity:.4}.stats{margin-top:20px;background:#101c30;border-radius:24px;padding:20px}.stat{display:flex;justify-content:space-between;padding:8px 0;color:var(--muted)}.stat strong{color:#fff}.note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:16px}.panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;margin:12px 0}.panel.active{display:block}.smallbtn{border:0;border-radius:14px;padding:12px;background:var(--mint);color:#05251e;font-weight:800;font-size:15px;width:100%}.player-row{display:flex;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}.player-row:last-child{border-bottom:0}.tabs{grid-template-columns:repeat(4,1fr)}.tab{cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
  <div class="top"><div class="wallet"><span class="ton-mark" aria-label="TON">💎</span> <b id="wallet">10000</b> TON</div><div class="brand">TON CRASH 🚀</div></div>
  <section class="card"><div class="balance-title">موجودی شما</div><div class="balance"><span>💎 TON</span> <b id="balance">10000</b></div><div class="muted" id="welcomeMessage">به TON CRASH خوش آمدی! 🎁</div></section>
- <div class="tabs"><div class="tab active">🚀 بازی کراش</div><div class="tab" id="invite">🎁 دعوت دوستان</div><div class="tab" id="scores">🏆 امتیازات</div></div>
- <section class="game"><div><div class="mult" id="mult">1.00x</div><div class="status" id="status">برای شروع آماده‌ای؟</div></div><div class="rocket" id="rocket">🚀</div><div class="floor"></div></section>
+ <div class="tabs"><div class="tab active" data-panel="gamePanel">🚀 بازی</div><div class="tab" data-panel="transferPanel">💸 انتقال</div><div class="tab" data-panel="scoresPanel">🏆 امتیازات</div><div class="tab" id="invite">🎁 دعوت</div></div>
+ <div id="gamePanel" class="panel active"><section class="game"><div><div class="mult" id="mult">1.00x</div><div class="status" id="status">برای شروع آماده‌ای؟</div></div><div class="rocket" id="rocket">🚀</div><div class="floor"></div></section>
  <label for="bet" class="muted">مقدار شرط (TON)</label><input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric">
  <div class="buttons"><button class="btn secondary" id="cashout" disabled>برداشت</button><button class="btn" id="start">شروع بازی 🚀</button></div>
  <div class="stats"><div class="stat"><span>شرط این دور</span><strong id="roundBet">0</strong></div><div class="stat"><span>سود احتمالی</span><strong id="profit">0</strong></div><div class="stat"><span>آخرین نتیجه</span><strong id="last">—</strong></div></div>
- <p class="note">این نسخه نمایشی است: موجودی بازیکنان در مرورگر خودشان ذخیره می‌شود و بین دستگاه‌ها مشترک نیست. نامحدود بودن حساب مالک در سمت مرورگر قابل دستکاری است و برای امنیت واقعی باید سمت سرور بررسی شود. هیچ TON واقعی در این بازی نگهداری یا منتقل نمی‌شود.</p>
+ </div><section id="transferPanel" class="panel"><h3>💸 انتقال TON</h3><label class="muted" for="recipient">آیدی عددی تلگرام گیرنده</label><input id="recipient" inputmode="numeric" placeholder="مثلاً 123456789"><label class="muted" for="transferAmount">مقدار انتقال</label><input id="transferAmount" type="number" min="1" step="1" placeholder="مقدار TON"><button class="smallbtn" id="sendTransfer">ارسال انتقال</button><p class="note">نسخه فعلی فقط انتقال آزمایشی را در همین مرورگر ثبت می‌کند؛ برای اینکه گیرنده روی دستگاه خودش واقعاً موجودی را بگیرد، بک‌اند و پایگاه داده مشترک لازم است.</p><div id="transferMessage" class="note"></div></section><section id="scoresPanel" class="panel"><h3>🏆 جدول امتیازات</h3><div id="leaderboard"></div><p class="note">جدول فعلاً از داده‌های ذخیره‌شده در همین مرورگر ساخته می‌شود و بین کاربران دستگاه‌های مختلف مشترک نیست.</p></section><p class="note">این نسخه نمایشی است و TON واقعی نگهداری یا منتقل نمی‌کند. موجودی نامحدود مدیر فقط وقتی فعال می‌شود که بازی داخل تلگرام باز شده باشد و شناسه واقعی تلگرام با شناسه مدیر برابر باشد. برای انتقال و جدول امتیازات مشترک و امن، سرور لازم است.</p>
 </div>
 <script>
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
 const $=id=>document.getElementById(id);
-const BALANCE_KEY='toncrash_balance_v3';
-const FIRST_VISIT_KEY='toncrash_balance_v3_initialized';
+const BALANCE_KEY='toncrash_balance_v4';
+const FIRST_VISIT_KEY='toncrash_balance_v4_initialized';
 const OWNER_TELEGRAM_ID='8871121102';
 const telegramUserId=String(tg?.initDataUnsafe?.user?.id ?? '');
 const isOwner=telegramUserId === OWNER_TELEGRAM_ID;
@@ -55,7 +55,7 @@ function chooseCrashPoint(){
 function showBalance(){ $('balance').textContent=Math.floor(balance);$('wallet').textContent=Math.floor(balance);localStorage.setItem(BALANCE_KEY,String(Math.floor(balance))); }
 function setStatus(s){$('status').textContent=s;}
 function stop(){running=false;clearInterval(timer);$('start').disabled=false;$('cashout').disabled=true;}
-function lose(){stop();balance-=0; $('mult').textContent=mult.toFixed(2)+'x';setStatus('💥 موشک سقوط کرد!');$('last').textContent='−'+bet;$('roundBet').textContent='0';$('profit').textContent='0';showBalance();}
+function lose(){stop(); $('mult').textContent=mult.toFixed(2)+'x';setStatus('💥 موشک سقوط کرد!');$('last').textContent='−'+bet;$('roundBet').textContent='0';$('profit').textContent='0';showBalance();}
 $('start').onclick=()=>{
  if(running)return;
  const amount=Math.floor(Number($('bet').value));
@@ -65,9 +65,14 @@ $('start').onclick=()=>{
  $('mult').textContent='1.00x';$('roundBet').textContent=bet;$('profit').textContent='0';$('last').textContent='—';setStatus('در حال پرواز...');$('start').disabled=true;$('cashout').disabled=false;
  timer=setInterval(()=>{const elapsed=(Date.now()-started)/1000;mult=1+elapsed*0.22+elapsed*elapsed*0.025;$('mult').textContent=mult.toFixed(2)+'x';$('profit').textContent=Math.max(0,Math.floor(bet*mult-bet));$('rocket').style.transform=`translate(${Math.min(260,elapsed*38)}px,${-Math.min(160,elapsed*18)}px) rotate(-18deg)`;if(mult>=crashAt){balance+=0;lose();showBalance();}},100);
 };
-$('cashout').onclick=()=>{if(!running)return;const won=Math.floor(bet*mult);if(!isOwner) balance+=won;stop();showBalance();setStatus('✅ برداشت موفق');$('last').textContent='+'+(won-bet);$('roundBet').textContent='0';$('profit').textContent='0';$('rocket').style.transform='';};
+$('cashout').onclick=()=>{if(!running)return;const won=Math.floor(bet*mult);if(!isOwner) balance+=won;stop();showBalance();setStatus('✅ برداشت موفق');$('last').textContent='+'+(won-bet);$('roundBet').textContent='0';$('profit').textContent='0';$('rocket').style.transform='';recordScore(won-bet);};
+function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));}catch(e){return fallback;}}
+function playerLabel(){return telegramUserId||'بازیکن این مرورگر';}
+function recordScore(points){const rows=readJSON('toncrash_scores_v1',[]);const id=playerLabel();let row=rows.find(x=>x.id===id);if(!row){row={id,score:0};rows.push(row);}row.score+=Math.max(0,points);localStorage.setItem('toncrash_scores_v1',JSON.stringify(rows));renderLeaderboard();}
+function renderLeaderboard(){const rows=readJSON('toncrash_scores_v1',[]).sort((a,b)=>b.score-a.score).slice(0,20);$('leaderboard').innerHTML=rows.length?rows.map((x,i)=>`<div class="player-row"><span>${i+1}. ${String(x.id).replace(/[<>&"']/g,'')}</span><strong>${Math.floor(x.score)} امتیاز</strong></div>`).join(''):'هنوز امتیازی ثبت نشده است.';}
+document.querySelectorAll('[data-panel]').forEach(tab=>tab.onclick=()=>{document.querySelectorAll('[data-panel]').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===tab.dataset.panel));if(tab.dataset.panel==='scoresPanel')renderLeaderboard();});
+$('sendTransfer').onclick=()=>{const to=$('recipient').value.trim(),amount=Math.floor(Number($('transferAmount').value)),msg=$('transferMessage');if(!/^\d{5,20}$/.test(to)){msg.textContent='آیدی عددی گیرنده را درست وارد کن.';return;}if(to===telegramUserId){msg.textContent='نمی‌توانی به خودت انتقال بدهی.';return;}if(!Number.isFinite(amount)||amount<1){msg.textContent='مقدار انتقال معتبر نیست.';return;}if(!isOwner&&amount>balance){msg.textContent='موجودی کافی نیست.';return;}if(!isOwner){balance-=amount;showBalance();}const key='toncrash_demo_user_'+to;const recipientBalance=Number(localStorage.getItem(key)||20000);localStorage.setItem(key,String(recipientBalance+amount));const transfers=readJSON('toncrash_transfers_v1',[]);transfers.unshift({from:playerLabel(),to,amount,time:new Date().toISOString()});localStorage.setItem('toncrash_transfers_v1',JSON.stringify(transfers.slice(0,100)));msg.textContent=`انتقال آزمایشی ${amount} TON ثبت شد. گیرنده فقط در همین مرورگر قابل شبیه‌سازی است؛ انتقال بین دستگاه‌ها هنوز فعال نیست.`;$('transferAmount').value='';};
 $('invite').onclick=()=>alert('بخش دعوت دوستان و پاداش آن در به‌روزرسانی بعدی فعال می‌شود.');
-$('scores').onclick=()=>alert('جدول امتیازات در نسخه سروری اضافه می‌شود.');
-showBalance();
+renderLeaderboard();showBalance();
 </script>
 </body></html>
