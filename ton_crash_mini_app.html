@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080e1d">
+<title>TON CRASH 🚀</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#080e1d;--panel:#142238;--line:#263a56;--mint:#36e0b5;--muted:#9aaac3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f6f8ff;font-family:system-ui,-apple-system,sans-serif;padding:18px 14px 28px}
+.wrap{max-width:680px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 24px}.brand{font-size:clamp(24px,6vw,34px);font-weight:850;color:var(--mint)}.wallet{background:var(--panel);border-radius:18px;padding:12px 16px;font-size:19px;white-space:nowrap}
+.card{background:linear-gradient(135deg,#172e45,#172039);border:1px solid #2b405c;border-radius:28px;padding:22px;margin-bottom:18px}.muted{color:var(--muted)}.balance-title{font-size:14px;color:var(--muted)}.balance{font-size:32px;font-weight:800;margin:6px 0}.balance span{font-size:17px;color:var(--mint)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.tab{background:var(--panel);padding:14px 5px;border-radius:17px;text-align:center;font-size:14px;color:#dce5f4}.tab.active{background:#204d51;color:var(--mint)}
+.game{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;height:330px;background-color:#101c30;background-image:linear-gradient(#26374e 1px,transparent 1px),linear-gradient(90deg,#26374e 1px,transparent 1px);background-size:10% 20%;display:flex;align-items:center;justify-content:center;text-align:center;margin:18px 0}.mult{font-size:clamp(50px,12vw,72px);font-weight:850;color:var(--mint);line-height:1}.status{color:var(--muted);margin-top:16px;font-size:18px}.rocket{position:absolute;left:18px;bottom:50px;font-size:36px;transition:transform .1s linear}.floor{position:absolute;bottom:28px;left:4%;right:4%;height:5px;background:var(--mint);border-radius:5px}
+input{width:100%;padding:17px;border-radius:18px;background:#101c30;border:1px solid #344761;color:#fff;font-size:20px;margin:8px 0 14px;outline:none}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:22px;padding:20px 10px;font-size:18px;font-weight:800;background:var(--mint);color:#05251e}.btn.secondary{background:#655a38;color:#fff}.btn:disabled{opacity:.4}.stats{margin-top:20px;background:#101c30;border-radius:24px;padding:20px}.stat{display:flex;justify-content:space-between;padding:8px 0;color:var(--muted)}.stat strong{color:#fff}.note{font-size:12px;line-height:1.8;color:var(--muted);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><div class="wallet">🪙 <b id="wallet">885</b></div><div class="brand">TON CRASH 🚀</div></div>
+ <section class="card"><div class="balance-title">موجودی آزمایشی شما</div><div class="balance"><span>TON فیک</span> <b id="balance">885</b></div><div class="muted">این سکه‌ها مجازی هستند و ارزش برداشت واقعی ندارند.</div></section>
+ <div class="tabs"><div class="tab active">🚀 بازی کراش</div><div class="tab" id="invite">🎁 دعوت دوستان</div><div class="tab" id="scores">🏆 امتیازات</div></div>
+ <section class="game"><div><div class="mult" id="mult">1.00x</div><div class="status" id="status">برای شروع آماده‌ای؟</div></div><div class="rocket" id="rocket">🚀</div><div class="floor"></div></section>
+ <label for="bet" class="muted">مقدار شرط (سکه مجازی)</label><input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric">
+ <div class="buttons"><button class="btn secondary" id="cashout" disabled>برداشت</button><button class="btn" id="start">شروع بازی 🚀</button></div>
+ <div class="stats"><div class="stat"><span>شرط این دور</span><strong id="roundBet">0</strong></div><div class="stat"><span>سود احتمالی</span><strong id="profit">0</strong></div><div class="stat"><span>آخرین نتیجه</span><strong id="last">—</strong></div></div>
+ <p class="note">نسخه آزمایشی با سکه مجازی است. این نسخه اولیه موجودی را فقط روی همین مرورگر ذخیره می‌کند؛ برای موجودی مشترک و ضدتقلب بین همه کاربران، باید سرور و پایگاه‌داده وصل شود. هرگز توکن ربات را داخل این فایل قرار نده.</p>
+</div>
+<script>
+const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
+const $=id=>document.getElementById(id);
+let balance=Number(localStorage.getItem('toncrash_balance')||885), running=false, bet=0, mult=1, crashAt=0, timer=null, started=0;
+function showBalance(){ $('balance').textContent=Math.floor(balance);$('wallet').textContent=Math.floor(balance);localStorage.setItem('toncrash_balance',String(Math.floor(balance))); }
+function setStatus(s){$('status').textContent=s;}
+function stop(){running=false;clearInterval(timer);$('start').disabled=false;$('cashout').disabled=true;}
+function lose(){stop();balance-=0; $('mult').textContent=mult.toFixed(2)+'x';setStatus('💥 موشک سقوط کرد!');$('last').textContent='−'+bet;$('roundBet').textContent='0';$('profit').textContent='0';showBalance();}
+$('start').onclick=()=>{
+ if(running)return;
+ const amount=Math.floor(Number($('bet').value));
+ if(!Number.isFinite(amount)||amount<1){setStatus('مقدار شرط معتبر نیست');return;}
+ if(amount>balance){setStatus('موجودی کافی نیست');return;}
+ bet=amount;balance-=bet;showBalance();mult=1;crashAt=1.15+Math.random()*4.2;started=Date.now();running=true;
+ $('mult').textContent='1.00x';$('roundBet').textContent=bet;$('profit').textContent='0';$('last').textContent='—';setStatus('در حال پرواز...');$('start').disabled=true;$('cashout').disabled=false;
+ timer=setInterval(()=>{const elapsed=(Date.now()-started)/1000;mult=1+elapsed*0.22+elapsed*elapsed*0.025;$('mult').textContent=mult.toFixed(2)+'x';$('profit').textContent=Math.max(0,Math.floor(bet*mult-bet));$('rocket').style.transform=`translate(${Math.min(260,elapsed*38)}px,${-Math.min(160,elapsed*18)}px) rotate(-18deg)`;if(mult>=crashAt){balance+=0;lose();showBalance();}},100);
+};
+$('cashout').onclick=()=>{if(!running)return;const won=Math.floor(bet*mult);balance+=won;stop();showBalance();setStatus('✅ برداشت موفق');$('last').textContent='+'+(won-bet);$('roundBet').textContent='0';$('profit').textContent='0';$('rocket').style.transform='';};
+$('invite').onclick=()=>{const link='https://t.me/toncrashepicbot';if(tg?.openTelegramLink)tg.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent('بیا TON CRASH بازی کنیم 🚀'));else alert('لینک ربات: '+link);};
+$('scores').onclick=()=>alert('جدول امتیازات در نسخه سروری اضافه می‌شود.');
+showBalance();
+</script>
+</body></html>
