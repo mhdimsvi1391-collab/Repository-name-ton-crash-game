@@ -25,30 +25,24 @@ input{width:100%;padding:17px;border-radius:18px;background:#101c30;border:1px s
  <label for="bet" class="muted">مقدار شرط (TON)</label><input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric">
  <div class="buttons"><button class="btn secondary" id="cashout" disabled>برداشت</button><button class="btn" id="start">شروع بازی 🚀</button></div>
  <div class="stats"><div class="stat"><span>شرط این دور</span><strong id="roundBet">0</strong></div><div class="stat"><span>سود احتمالی</span><strong id="profit">0</strong></div><div class="stat"><span>آخرین نتیجه</span><strong id="last">—</strong></div></div>
- <p class="note">موجودی این نسخه فقط در همین مرورگر ذخیره می‌شود و بین همه بازیکنان/دستگاه‌ها مشترک نیست. موجودی نامحدود مالک در این فایل فقط نمایشی است؛ برای اجرای امن و مشترک باید منطق موجودی سمت سرور باشد. هرگز توکن ربات را داخل این فایل قرار نده.</p>
+ <p class="note">این نسخه نمایشی است: موجودی بازیکنان در مرورگر خودشان ذخیره می‌شود و بین دستگاه‌ها مشترک نیست. نامحدود بودن حساب مالک در سمت مرورگر قابل دستکاری است و برای امنیت واقعی باید سمت سرور بررسی شود. هیچ TON واقعی در این بازی نگهداری یا منتقل نمی‌شود.</p>
 </div>
 <script>
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
 const $=id=>document.getElementById(id);
-const BALANCE_KEY='toncrash_balance_v2';
-const FIRST_VISIT_KEY='toncrash_first_bonus_v1';
-const MIGRATION_KEY='toncrash_20000_migration_v1';
-// Replace this with the owner's numeric Telegram user ID before publishing.
-// Client-side owner checks are only for a demo and are not secure.
-const OWNER_TELEGRAM_ID='PUT_OWNER_NUMERIC_TELEGRAM_ID_HERE';
-const userId=String(tg?.initDataUnsafe?.user?.id || '');
-const isOwner=OWNER_TELEGRAM_ID!=='PUT_OWNER_NUMERIC_TELEGRAM_ID_HERE' && userId===OWNER_TELEGRAM_ID;
-// One-time per-browser migration: give existing local users 20,000 once.
-if(localStorage.getItem(MIGRATION_KEY)!=='done'){
-  localStorage.setItem(BALANCE_KEY,'20000');
-  localStorage.setItem(FIRST_VISIT_KEY,'claimed');
-  localStorage.setItem(MIGRATION_KEY,'done');
-}
+const BALANCE_KEY='toncrash_balance_v3';
+const FIRST_VISIT_KEY='toncrash_balance_v3_initialized';
+const OWNER_TELEGRAM_ID='8871121102';
+const telegramUserId=String(tg?.initDataUnsafe?.user?.id ?? '');
+const isOwner=telegramUserId === OWNER_TELEGRAM_ID;
+
+// This client-only demo resets each browser's demo balance to 20,000 once
+// when this version is first opened. It is not a shared/server-side wallet.
 if(localStorage.getItem(FIRST_VISIT_KEY)!=='claimed'){
   localStorage.setItem(BALANCE_KEY,'20000');
   localStorage.setItem(FIRST_VISIT_KEY,'claimed');
 }
-let balance=isOwner?Infinity:Number(localStorage.getItem(BALANCE_KEY)||20000), running=false, bet=0, mult=1, crashAt=0, timer=null, started=0;
+let balance=Number(localStorage.getItem(BALANCE_KEY) || 20000), running=false, bet=0, mult=1, crashAt=0, timer=null, started=0;
 function chooseCrashPoint(){
  // Suggested weighted bands: 65% for 1–2x, 25% for 2–5x, 8% for 5–10x, 1.5% for 10–20x, 0.5% for 20–100x.
  const r=Math.random();
@@ -71,7 +65,7 @@ $('start').onclick=()=>{
  $('mult').textContent='1.00x';$('roundBet').textContent=bet;$('profit').textContent='0';$('last').textContent='—';setStatus('در حال پرواز...');$('start').disabled=true;$('cashout').disabled=false;
  timer=setInterval(()=>{const elapsed=(Date.now()-started)/1000;mult=1+elapsed*0.22+elapsed*elapsed*0.025;$('mult').textContent=mult.toFixed(2)+'x';$('profit').textContent=Math.max(0,Math.floor(bet*mult-bet));$('rocket').style.transform=`translate(${Math.min(260,elapsed*38)}px,${-Math.min(160,elapsed*18)}px) rotate(-18deg)`;if(mult>=crashAt){balance+=0;lose();showBalance();}},100);
 };
-$('cashout').onclick=()=>{if(!running)return;const won=Math.floor(bet*mult);if(!isOwner)balance+=won;stop();showBalance();setStatus('✅ برداشت موفق');$('last').textContent='+'+(won-bet);$('roundBet').textContent='0';$('profit').textContent='0';$('rocket').style.transform='';};
+$('cashout').onclick=()=>{if(!running)return;const won=Math.floor(bet*mult);if(!isOwner) balance+=won;stop();showBalance();setStatus('✅ برداشت موفق');$('last').textContent='+'+(won-bet);$('roundBet').textContent='0';$('profit').textContent='0';$('rocket').style.transform='';};
 $('invite').onclick=()=>alert('بخش دعوت دوستان و پاداش آن در به‌روزرسانی بعدی فعال می‌شود.');
 $('scores').onclick=()=>alert('جدول امتیازات در نسخه سروری اضافه می‌شود.');
 showBalance();
