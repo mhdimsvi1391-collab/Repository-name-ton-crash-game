@@ -39,6 +39,8 @@ input{width:100%;padding:15px;border-radius:15px;background:#101c30;border:1px s
  <div class="modalhead"><h3>🏆 جدول امتیازات</h3><button class="close" data-close="scoresModal">✕</button></div>
  <p class="small">رتبه‌بندی بر اساس مجموع سود خالص ثبت‌شده در همین مرورگر.</p>
  <div id="scoresContent"></div>
+ <hr style="border-color:#344761;margin:18px 0">
+ <h4>آخرین انتقال‌های این مرورگر</h4><div id="transferHistory" class="small"></div>
  </div></div>
 <script>
 const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();}
@@ -85,12 +87,34 @@ $('cashout').onclick=()=>{
 };
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}
 $('transferTab').onclick=()=>{ $('transferMessage').textContent='';$('recipient').value='';$('transferAmount').value='';openModal('transferModal');};
-$('scoresTab').onclick=()=>{renderScores();openModal('scoresModal');};
+$('scoresTab').onclick=()=>{renderScores();renderTransferHistory();openModal('scoresModal');};
 $('gameTab').onclick=()=>{closeModal('transferModal');closeModal('scoresModal');};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
-function renderScores(){const rows=Object.values(getScores()).sort((a,b)=>b.profit-a.profit);if(!rows.length){$('scoresContent').innerHTML='<p class="small">هنوز امتیازی ثبت نشده است. یک دور بازی کن.</p>';return;}$('scoresContent').innerHTML='<table><thead><tr><th>رتبه</th><th>بازیکن</th><th>سود خالص</th></tr></thead><tbody>'+rows.slice(0,50).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${r.profit>0?'+':''}${fmt(r.profit)} TON</td></tr>`).join('')+'</tbody></table>';}
+function renderScores(){
+ let rows=Object.values(getScores()).filter(r=>r&&typeof r==='object').sort((a,b)=>(Number(b.profit)||0)-(Number(a.profit)||0));
+ if(!rows.length){$('scoresContent').innerHTML='<p class="small">هنوز امتیازی ثبت نشده است. یک دور بازی کن تا نامت در جدول ثبت شود.</p>';return;}
+ $('scoresContent').innerHTML='<table><thead><tr><th>رتبه</th><th>بازیکن</th><th>سود خالص</th></tr></thead><tbody>'+
+ rows.slice(0,50).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name||'بازیکن')}</td><td>${(Number(r.profit)||0)>0?'+':''}${fmt(Number(r.profit)||0)} TON</td></tr>`).join('')+
+ '</tbody></table><p class="small">بازیکن‌ها و امتیازهای این جدول فقط از همین مرورگر خوانده می‌شوند؛ برای جدول مشترک همه کاربران باید سرور وصل شود.</p>';
+}
+function renderTransferHistory(){
+ let logs=[];try{logs=JSON.parse(localStorage.getItem(transfersKey)||'[]');if(!Array.isArray(logs))logs=[];}catch{logs=[];}
+ logs=logs.slice(-10).reverse();
+ $('transferHistory').innerHTML=logs.length?'<table><thead><tr><th>فرستنده</th><th>گیرنده</th><th>مقدار</th></tr></thead><tbody>'+logs.map(x=>`<tr><td>${escapeHtml(x.from)}</td><td>${escapeHtml(x.to)}</td><td>${fmt(x.amount)} TON</td></tr>`).join('')+'</tbody></table>':'<p>هنوز انتقالی ثبت نشده است.</p>';
+}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-$('sendTransfer').onclick=()=>{const recipient=$('recipient').value.trim();const amount=Math.floor(Number($('transferAmount').value));const msg=$('transferMessage');if(!/^\d{5,20}$/.test(recipient)){msg.textContent='شناسهٔ عددی معتبر وارد کن.';return;}if(recipient===telegramUserId&&telegramUserId){msg.textContent='نمی‌توانی به خودت انتقال بدهی.';return;}if(!Number.isFinite(amount)||amount<1){msg.textContent='مقدار انتقال معتبر نیست.';return;}if(!isOwner&&amount>balance){msg.textContent='موجودی کافی نیست.';return;}if(isOwner){msg.textContent='حساب مدیر نامحدود است؛ برای انتقال آزمایشی از حساب عادی استفاده کن.';return;}const recipientKey=balanceKey(recipient);const recipientBalance=Number(localStorage.getItem(recipientKey)||20000);balance-=amount;localStorage.setItem(balanceKey(localPlayerId),String(balance));localStorage.setItem(recipientKey,String(recipientBalance+amount));const logs=JSON.parse(localStorage.getItem(transfersKey)||'[]');logs.push({from:localPlayerId,to:recipient,amount,at:Date.now()});localStorage.setItem(transfersKey,JSON.stringify(logs));showBalance();msg.textContent='✅ انتقال آزمایشی ثبت شد. فقط در همین مرورگر قابل مشاهده است.';};
+$('sendTransfer').onclick=()=>{const recipient=$('recipient').value.trim();const amount=Math.floor(Number($('transferAmount').value));const msg=$('transferMessage');if(!/^\d{5,20}$/.test(recipient)){msg.textContent='شناسهٔ عددی معتبر وارد کن.';return;}if(recipient===telegramUserId&&telegramUserId){msg.textContent='نمی‌توانی به خودت انتقال بدهی.';return;}if(!Number.isFinite(amount)||amount<1){msg.textContent='مقدار انتقال معتبر نیست.';return;}
+if(!isOwner&&amount>balance){msg.textContent='موجودی کافی نیست.';return;}
+const recipientKey=balanceKey(recipient);
+const recipientRaw=localStorage.getItem(recipientKey);
+const recipientBalance=recipientRaw===null?20000:Number(recipientRaw);
+if(!isOwner){balance-=amount;localStorage.setItem(balanceKey(localPlayerId),String(balance));}
+localStorage.setItem(recipientKey,String(recipientBalance+amount));
+let logs=[];try{logs=JSON.parse(localStorage.getItem(transfersKey)||'[]');if(!Array.isArray(logs))logs=[];}catch{logs=[];}
+logs.push({from:isOwner?'مدیر':localPlayerId,to:recipient,amount,at:Date.now()});
+localStorage.setItem(transfersKey,JSON.stringify(logs));
+showBalance();
+msg.textContent='✅ انتقال آزمایشی ثبت شد. '+(isOwner?'موجودی نامحدود مدیر کم نشد. ':'')+'این انتقال فقط در همین مرورگر ذخیره می‌شود.';};
 if(isOwner)$('welcomeMessage').textContent='سلام مدیر! موجودی نامحدود برای حساب شناسایی‌شده فعال است. 👑';
 else if(!telegramUserId)$('welcomeMessage').textContent='نسخهٔ پیش‌نمایش در مرورگر باز شده؛ برای تشخیص حساب مدیر، بازی را از داخل تلگرام باز کن.';
 showBalance();
