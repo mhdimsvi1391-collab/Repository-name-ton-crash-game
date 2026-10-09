@@ -58,13 +58,31 @@ const fmt=n=>Number(n).toLocaleString('en-US');
 function showBalance(){const shown=isOwner?'∞':fmt(Math.max(0,Math.floor(balance)));$('balance').textContent=shown;$('wallet').textContent=shown;if(!isOwner)localStorage.setItem(balanceKey(localPlayerId),String(Math.floor(balance)));}
 function getScores(){try{return JSON.parse(localStorage.getItem(scoresKey)||'{}')}catch{return {}}}
 function recordProfit(amount){const s=getScores();const key=localPlayerId; if(!s[key])s[key]={id:key,name:tg?.initDataUnsafe?.user?.first_name||('بازیکن '+String(key).slice(-5)),profit:0};s[key].profit+=amount;localStorage.setItem(scoresKey,JSON.stringify(s));}
-function chooseCrashPoint(){const r=Math.random();if(r<.65)return 1+Math.random();if(r<.90)return 2+Math.random()*3;if(r<.98)return 5+Math.random()*5;if(r<.995)return 10+Math.random()*10;return 20+Math.random()*80;}
+function chooseCrashPoint(){const r=Math.random();if(r<.65)return 1.2+Math.random()*.8;if(r<.90)return 2+Math.random()*3;if(r<.98)return 5+Math.random()*5;if(r<.995)return 10+Math.random()*10;return 20+Math.random()*80;}
 function setStatus(s){$('status').textContent=s}
 function stop(){running=false;clearInterval(timer);$('start').disabled=false;$('cashout').disabled=true}
 function lose(){stop();$('mult').textContent=mult.toFixed(2)+'x';setStatus('💥 موشک سقوط کرد! شرط از دست رفت');$('last').textContent='−'+fmt(bet);$('roundBet').textContent='0';$('profit').textContent='0';recordProfit(-bet);showBalance();$('rocket').style.transform='';}
 $('start').onclick=()=>{if(running)return;const amount=Math.floor(Number($('bet').value));if(!Number.isFinite(amount)||amount<1){setStatus('مقدار شرط معتبر نیست');return;}if(!isOwner&&amount>balance){setStatus('موجودی کافی نیست');return;}bet=amount;if(!isOwner){balance-=bet;showBalance();}mult=1;crashAt=chooseCrashPoint();started=Date.now();running=true;$('mult').textContent='1.00x';$('roundBet').textContent=fmt(bet);$('profit').textContent='0';$('last').textContent='—';setStatus('در حال پرواز...');$('start').disabled=true;$('cashout').disabled=false;$('rocket').style.transform='';
 timer=setInterval(()=>{const elapsed=(Date.now()-started)/1000;mult=1+elapsed*.22+elapsed*elapsed*.025;$('mult').textContent=mult.toFixed(2)+'x';$('profit').textContent=fmt(Math.max(0,Math.floor(bet*(mult-1))));$('rocket').style.transform=`translate(${Math.min(260,elapsed*38)}px,${-Math.min(160,elapsed*18)}px) rotate(-18deg)`;if(mult>=crashAt)lose();},50);};
-$('cashout').onclick=()=>{if(!running)return;const payout=Math.floor(bet*mult);const net=payout-bet;if(!isOwner){balance+=payout;showBalance();}stop();recordProfit(net);setStatus('✅ برداشت موفق: '+fmt(payout)+' TON');$('last').textContent='+'+fmt(net);$('roundBet').textContent='0';$('profit').textContent=fmt(net);$('rocket').style.transform='';};
+$('cashout').onclick=()=>{
+ if(!running)return;
+ // Recalculate the multiplier at the exact moment the player taps cash out.
+ const elapsed=(Date.now()-started)/1000;
+ const currentMult=1+elapsed*.22+elapsed*elapsed*.025;
+ if(currentMult>=crashAt){mult=crashAt;lose();return;}
+ mult=currentMult;
+ const payout=Math.floor(bet*mult);
+ const net=payout-bet;
+ stop();
+ if(!isOwner){balance=balance+payout;showBalance();}
+ recordProfit(net);
+ $('mult').textContent=mult.toFixed(2)+'x';
+ setStatus('✅ برداشت شد: '+fmt(payout)+' TON | سود خالص: '+fmt(net)+' TON');
+ $('last').textContent=(net>=0?'+':'')+fmt(net);
+ $('roundBet').textContent='0';
+ $('profit').textContent=(net>=0?'+':'')+fmt(net);
+ $('rocket').style.transform='';
+};
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}
 $('transferTab').onclick=()=>{ $('transferMessage').textContent='';$('recipient').value='';$('transferAmount').value='';openModal('transferModal');};
 $('scoresTab').onclick=()=>{renderScores();openModal('scoresModal');};
